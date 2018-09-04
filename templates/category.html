@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block articles %}
+    <div id="posts" class="posts-expand">
+        <div class="post-block page" style="opacity: 1; display: block;">
+            <header class="post-header" style="opacity: 1; display: block; transform: translateY(0px);">
+                <h1 class="post-title">categories</h1>
+            </header>
+            <div class="post-body" style="opacity: 1; display: block; transform: translateY(0px);">
+                <div class="category-all-page">
+                    <div class="category-all-title">
+                        目前共计 {{ category_obj_list.count }} 个分类
+                    </div>
+                    <div class="category-all">
+                        <ul class="category-list" style="margin-left: 10px">
+                            {% for category in category_obj_list %}
+                            <li class="category-list-item" style="list-style: circle"><a class="category-list-link" href="{% url 'categories' site=site %}{{ category.title }}" style="border-bottom: 1px solid #999">{{ category.title }}</a><span
+                                    class="category-list-count">{{ category.article_set.count }}</span></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

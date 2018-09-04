@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>注册</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/mystyle.css">
+</head>
+<body>
+{% load mytags %}
+
+<div class="container" style="margin-top: 100px">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <form class="form-horizontal" novalidate enctype="multipart/form-data">
+                {% csrf_token %}
+                <!- 循环生成注册表 ->
+                {% for k in form_obj.fields %}
+                    <div class="form-group">
+                        <label for="{{ form_obj|get_d:k|get_id_for_label }}"
+                               class="col-sm-2 control-label">{{ form_obj|get_d:k|get_label }}</label>
+                        <div class="col-sm-10">
+                            {{ form_obj|get_d:k }}
+                            <span class="help-block">{{ form_obj|get_d:k|get_errors }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <!- 头像 ->
+                <div class="form-group">
+                    <label for="id_avatar" class="col-sm-2 control-label">头像</label>
+                    <div class="col-sm-10">
+                        <label for="id_avatar">
+                            <img src="/static/img/default.png" id="avatar-img">
+                            <input type="file" accept="image/*" name="avatar" id="id_avatar" style="display: none">
+                            <span class="help-block"></span>
+                        </label>
+
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="button" class="btn btn-primary btn-block" id="submit">注 册</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="https://cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>　　
+<script src="https://cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="https://cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script>
+    // 找到头像的input标签绑定input事件
+    $('#id_avatar').change(function () {
+        // 1. 创建一个读取文件的对象
+        var fileReader = new FileReader();
+        // 取到当前选中的头像文件
+        // console.log(this.files[0]);
+        // 读取你选中的那个文件
+        fileReader.readAsDataURL(this.files[0]);
+        fileReader.onload = function () {
+            // 2. 等上一步读完文件之后 才把图片加载到img标签
+            $('#avatar-img').attr('src', fileReader.result);
+        };
+    });
+
+
+    // Ajax提交注册的数据
+    $('#submit').click(function () {
+        // 取到用户填写的注册数据，向后端发送AJAX请求
+        var formData = new FormData();
+        formData.append('username', $('#id_username').val());
+        formData.append('password', $('#id_password').val());
+        formData.append('re_password', $('#id_re_password').val());
+        formData.append('email', $('#id_email').val());
+        formData.append('avatar', $('#id_avatar')[0].files[0]);
+        formData.append('csrfmiddlewaretoken', $("[name='csrfmiddlewaretoken']").val());
+        
+        $.ajax({
+            url: '/signup/',
+            type: 'post',
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: function (data) {
+                if (data.status != 0){
+                    // error
+                    $.each(data.msg, function (k, v) {
+                        // console.log("id_"+k, v[0]);
+                        // console.log($("#id_"+k));
+                        $("#id_"+k).next("span").text(v[0]).parent().parent().addClass("has-error");
+                    })
+                }
+                else {
+                    location.href = data.msg;
+                }
+            }
+        })
+    })
+
+    // 将所有的input框绑定获取焦点的事件，将所有的错误信息清空
+    $("form input").focus(function () {
+        $(this).next().text("").parent().parent().removeClass("has-error");
+    })
+
+</script>
+
+
+</body>
+</html>

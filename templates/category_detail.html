@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block articles %}
+    <div class="post-block category" style="opacity: 1; display: block;">
+        <div id="posts" class="posts-collapse">
+            <div class="collection-title" style="opacity: 1; display: block; transform: translateX(0px);">
+                <h1>{{ category_obj.title }}
+                    <small>分类</small>
+                </h1>
+            </div>
+            {% for article in category_obj.article_set.iterator %}
+                <article class="post post-type-normal">
+                    <header class="post-header" style="opacity: 1; display: block; transform: translateY(0px);">
+                        <h2 class="post-title" style="margin-left: 100px">
+                            <a class="post-title-link" href="{% url 'get_article' site=site article_id=article.nid %}">
+                                <span>{{ article.title }}</span>
+                            </a>
+                        </h2>
+                        <div class="post-meta">
+                            <time class="post-time">
+                                {{ article.create_time|date:"Y-m-d" }}
+                            </time>
+                        </div>
+                    </header>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock articles %}

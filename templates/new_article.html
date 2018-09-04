@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8"/>
+    <title>写文章</title>
+    <link rel="stylesheet" href="/static/markdowneditor/css/style.css"/>
+    <link rel="stylesheet" href="/static/markdowneditor/css/editormd.css"/>
+    <link rel="shortcut icon" href="https://pandao.github.io/editor.md/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+
+</head>
+<body>
+{% load staticfiles %}
+<div id="layout">
+    <header>
+        <h1>开始新的记录</h1>
+    </header>
+    <div class="clearfix">
+        {% csrf_token %}
+        <form class="form-horizontal col-sm-10 col-sm-offset-1">
+            <div class="form-group">
+                <div class="col-sm-11">
+                    <input class="form-control" type="text" id="title" placeholder="请输入文章标题">
+                </div>
+                <div class="col-sm-1">
+                    <a class="btn btn-danger" id="submit">发布博客</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="test-editormd" style="margin: auto">
+        <textarea style="display:none;"></textarea>
+    </div>
+
+    <!---点击发布弹出 文章标签、分类选择 模态框-->
+    <link rel="stylesheet" href="/static/css/main.css">
+    <div id="my-cover" class="hide"></div>
+    <div id="my-modal" class="hide">
+        <div class="container-fluid">
+            <form class="col-sm-8 col-sm-offset-2">
+                <div class="form-group">
+                    <label for="category">请选择分类：</label><small>分类只能选一个，新增优先</small>
+                    <a href="#" title="新建分类" id="new-category"><img
+                            src="/static/img/icon-addlink.svg"></a>
+                    <select class="form-control" name="category" id="category" style="display: inline-block">
+                        <option value="None">请选择</option>
+                        {% for category in categories %}
+                            <option value="{{ category.nid }}">{{ category.title }}</option>
+                        {% endfor %}
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="tags">请选择标签：</label>
+                    <a href="#" title="新建标签" id="new-tag"><img
+                            src="/static/img/icon-addlink.svg"></a>
+                    <div class="checkbox">
+                        {% for tag in tags %}
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="inlineCheckbox1" value="{{ tag.nid }}"> {{ tag.title }}
+                            </label>
+                        {% endfor %}
+
+                    </div>
+                </div>
+                <a class="btn btn-danger" id="sub">发 布</a>
+                <a class="btn btn-danger" id="xxx">关 闭</a>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script src="/static/markdowneditor/js/jquery.min.js"></script>
+<script src="/static/markdowneditor/js/editormd.min.js"></script>
+<script type="text/javascript">
+    var testEditor;
+
+    $(function () {
+        testEditor = editormd("test-editormd", {
+            width: "90%",
+            height: 740,
+            syncScrolling: "single",
+            path: "/static/markdowneditor/lib/",
+            // 自定义，去除多余按钮
+            toolbarIcons: function () {
+                // Or return editormd.toolbarModes[name]; // full, simple, mini
+                // Using "||" set icons align right.
+                return ["undo", "redo", "|", "bold", "del", "italic", "quote", "uppercase", "|", "h1", "h2", "h3", "h4", "h5", "h6", "|",
+                    "list-ul", "list-ol", "hr", "|", "link", "reference-link", "image", "code", "preformatted-text", "code-block",
+                    "table", "datetime", "html-entities", "pagebreak", "|", "goto-line", "watch", "preview", "search", "fullscreen",
+                    "clear", "info"]
+            },
+            theme: "dark",
+            previewTheme: "dark",
+            editorTheme: "pastel-on-dark",
+            codeFold: true,
+            saveHTMLToTextarea: true,    // 保存 HTML 到 Textarea
+            searchReplace: true,
+            //watch : false,                // 关闭实时预览
+            htmlDecode: false,            // 开启 HTML 标签解析，为了安全性，默认不开启
+            //toolbar  : false,             //关闭工具栏
+            //previewCodeHighlight : false, // 关闭预览 HTML 的代码块高亮，默认开启
+            emoji: true,
+            taskList: true,
+            tocm: true,         // Using [TOCM]
+            tex: true,                   // 开启科学公式TeX语言支持，默认关闭
+            flowChart: true,             // 开启流程图支持，默认关闭
+            sequenceDiagram: true,       // 开启时序/序列图支持，默认关闭,
+
+            dialogLockScreen: false,   // 设置弹出层对话框不锁屏，全局通用，默认为true
+            dialogShowMask: false,     // 设置弹出层对话框显示透明遮罩层，全局通用，默认为true
+            dialogDraggable: false,    // 设置弹出层对话框不可拖动，全局通用，默认为true
+            dialogMaskOpacity: 0.4,    // 设置透明遮罩层的透明度，全局通用，默认值为0.1
+            dialogMaskBgColor: "#000", // 设置透明遮罩层的背景颜色，全局通用，默认为#fff
+
+            // 上传图片
+            // editor.md期望你上传图片的服务返回如下json格式的内容：
+            /*{
+                success : 0 | 1, //0表示上传失败;1表示上传成功
+                message : "提示的信息",
+                url     : "图片地址" //上传成功时才返回
+            }*/
+            imageUpload: true,
+            imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+            imageUploadURL: "/pics/upload/",
+            onload: function () {
+                // 上传成功之后做点啥
+                console.log('onload', this);
+                //this.fullscreen();
+                //this.unwatch();
+                //this.watch().fullscreen();
+
+                //this.setMarkdown("#PHP");
+                //this.width("100%");
+                //this.height(480);
+                //this.resize("100%", 640);
+            }
+        });
+
+        /*
+        // or
+        testEditor = editormd({
+            id      : "test-editormd",
+            width   : "90%",
+            height  : 640,
+            path    : "../lib/"
+        });
+        */
+    });
+</script>
+
+<script>
+    // 提交按钮
+    var $submitBtn = $('#submit')
+    var $titleInput = $('#title')
+    $submitBtn.on('click', function () {
+        // 检验是否键入内容
+        if (!$titleInput.val() || !$('.editormd-markdown-textarea').val()) {
+            alert('标题和内容不能为空！');
+            return false;
+        }
+        $('#my-cover').removeClass('hide');
+        $('#my-modal').removeClass('hide');
+        return false
+    });
+
+    // 发布按钮
+    $('#sub').on('click', function () {
+        // 获取表单内容
+        var category = $('#category').val();
+        if (category === 'None') {
+            var new_add_category = $('.new-category-input').val().trim();  // 是否新建标签
+        }
+
+        var tags = [];
+        $(':checkbox:checked').each(function () {
+            tags.push($(this).val())
+        });
+        var new_add_tags = [];  //用户新增的标签
+        $('.new-tag-input').each(function () {
+            if ($(this).val().trim() != ''){
+                new_add_tags.push($(this).val().trim())
+            }
+        });
+
+        var articleTitle = $('#title').val();
+        var articleContent = $('.editormd-markdown-textarea').val();
+        // 分类和标签检验
+        if (category === 'None' && new_add_category === "" || tags.length == 0 && new_add_tags.length == 0) {
+            alert('请选择分类和标签！')
+            return false
+        }
+        // ajax提交数据
+        $.ajax({
+            type: "post",
+            url: '/articles/new/',
+            dataType: "json",
+            data: {
+                csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
+                title: articleTitle,
+                content: articleContent,
+                category: category,
+                new_add_category: new_add_category,
+                tags: JSON.stringify(tags),
+                new_add_tags: JSON.stringify(new_add_tags)
+            },
+            success: function (data) {
+                console.log(data);
+                if (data.status != 0) {
+                    // 有错误，在页面上提示
+                    alert(data.msg);
+                    return false
+                } else {
+                    alert('发布成功！')
+                    location.href = data.msg;
+                }
+            }
+        });
+    })
+
+
+    // 关闭按钮
+    $('#xxx').on('click', function () {
+        $('#my-cover').addClass('hide');
+        $('#my-modal').addClass('hide');
+    })
+</script>
+
+<script>
+    var tmp = 0
+    var tmp2 = 0
+    // 新建标签/分类
+    $('#new-category').on('click', function () {
+        if (tmp == 0) {
+            tmp += 1
+            // 新建输入框元素
+            var categoryInput = document.createElement('input');
+            //<input type="text" class="s_ipt" name="wd" id="kw" maxlength="100">
+            categoryInput.type = 'text';
+            categoryInput.name = 'new-category-input';
+            categoryInput.id = 'new-category-input';
+            categoryInput.className = 'new-category-input';
+            $('#new-category').before(categoryInput);
+            return false
+        }
+        return false
+    })
+
+    $('#new-tag').on('click', function () {
+        if (tmp2 < 3) {
+            tmp2 += 1
+            // 新建输入框元素
+            var tagInput = document.createElement('input');
+            //<input type="text" class="s_ipt" name="wd" id="kw" maxlength="100">
+            tagInput.type = 'text';
+            tagInput.name = 'new-tag-input';
+            tagInput.id = 'new-tag-input';
+            tagInput.className = 'new-tag-input';
+            $('#new-tag').before(tagInput);
+            return false
+        }
+        alert('最多添加3个标签！')
+        return false
+    })
+</script>
+</body>
+</html>

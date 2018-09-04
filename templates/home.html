@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load mytags %}
+{% block articles %}
+    <link rel="stylesheet" href="/static/css/main.css">
+    <!--文章开始-->
+    <section id="posts" class="posts-expand">
+    {% for article in article_list %}
+        <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+            <div class="post-block">
+                <header class="post-header">
+                    <h1 class="post-title" itemprop="name headline">
+                        <a class="post-title-link"
+                           href="/{{ site }}/articles/{{ article.nid }}">
+                            {{ article.title }}
+                        </a>
+                    </h1>
+                    <div class="post-meta">
+                                            <span class="post-time">
+                                            <span class="post-meta-item-icon">
+                                                <i class="fa fa-calendar-o"></i>
+                                            </span>
+                                            <span class="post-meta-item-text">发表于</span>
+                                                    {{ article.create_time|date:"Y-m-d H:i:s" }}
+                                            </span>
+                        <span class="post-category">
+                                                <span class="post-meta-divider">|</span>
+                                                <span class="post-meta-item-icon">
+                                                    <i class="fa fa-folder-o"></i>
+                                                </span>
+                                                <span class="post-meta-item-text">分类于</span>
+                                                <a href="/{{ site }}/categories/{{ article.category }}/">
+                                                        <span itemprop="name">{{ article.category }}</span>
+                                                        </a>
+                                                </span>
+                        </span>
+                        <div class="post-wordcount">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                            <span class="post-meta-item-text">字数统计&#58;</span>
+                            <span title="字数统计">
+                  {% with article.articledetail.content|wordcount as cnt %}
+                      {{ cnt }}
+                      </span>
+                      <span class="post-meta-divider">|</span>
+                      <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                      <span title="阅读时长">
+                      {{ cnt|get_read_time }}
+                  {% endwith %}
+                                </span>
+                        </div>
+                    </div>
+                </header>
+                <div class="post-body">
+                    {{ article.abstract }}
+                    ...
+                    <!--noindex-->
+                    <div class="post-button text-center">
+                        <a class="btn"
+                           href="/{{ site }}/articles/{{ article.nid }}"
+                           rel="contents">
+                            阅读全文 &raquo;
+                        </a>
+                    </div>
+                    <!--/noindex-->
+                </div>
+                <footer class="post-footer">
+                    <div class="post-eof"></div>
+                </footer>
+            </div>
+        </article>
+    {% if forloop.last %}
+             <!--分页展示-->
+        <link rel="stylesheet" href="/static/css/main.css">
+        <div id="pagination">
+{#        <nav aria-label="Page navigation">#}
+     <ul class="my-pagination">
+            {{ page_nav_html|safe }}
+{#     </ul></nav>#}
+        </div>
+
+    {% endif %}
+    {% empty %}
+        <div class="post-block" style="opacity: 1; display: block;">
+            <header class="post-header" style="opacity: 1; display: block; transform: translateY(0px);">
+                <h1 class="post-title">
+                    空空如也
+                </h1>
+
+            </header>
+            <div class="post-body" style="opacity: 1; display: block; transform: translateY(0px);">
+                快去写点什么吧...
+                <!--noindex-->
+            </div>
+            <footer class="post-footer">
+                <div class="post-eof"></div>
+            </footer>
+        </div>
+    {% endfor %}
+    </section>
+{% endblock articles %}
+

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load mytags %}
+{% block articles %}
+    <link rel="stylesheet" href="/static/css/main.css">
+
+    <div class="post-block archive" style="opacity: 1; display: block;">
+        <div id="posts" class="posts-collapse">
+            <span class="archive-move-on"></span>
+            {% if article_list %}
+                <span class="archive-page-counter">
+        嗯..! 目前共计 {{ articles.count }} 篇日志。 继续努力。
+      </span>
+
+            {% regroup article_list by create_time.year as year_post_group %}
+            <ul>
+                {% for year in year_post_group %}
+                    <div class="collection-title" style="opacity: 1; display: block; transform: translateX(0px);">
+                        <h1 class="archive-year"
+                            style="opacity: 1; display: block; transform: translateX(0px);">{{ year.grouper }}</h1>
+                    </div>
+                    {% regroup year.list by create_time.month as month_post_group %}
+                    <ul>
+                        {% for month in month_post_group %}
+                            <div class="collection-title"
+                                 style="opacity: 1; display: block; margin: 40px 0; transform: translateX(0px);">
+                                <h2 class="archive-month"
+                                    style="opacity: 1; display: block; transform: translateX(0px);">{{ month.grouper }}
+                                    月</h2>
+                            </div>
+                            {% for post in month.list %}
+                                <article class="post post-type-normal">
+                                    <header class="post-header"
+                                            style="opacity: 1; display: block; transform: translateY(0px);">
+                                        <h2 class="post-title">
+                                            <a class="post-title-link"
+                                               href="{% url 'get_article' site=site article_id=post.nid %}">
+                                                <span>{{ post.title }}</span>
+                                            </a>
+                                        </h2>
+                                        <div class="post-meta">
+                                            <time class="post-time">
+                                                {{ post.create_time|date:"m-d" }}
+                                            </time>
+                                        </div>
+                                    </header>
+                                </article>
+
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </ul>
+
+            <!--分页展示-->
+            <link rel="stylesheet" href="/static/css/main.css">
+            <div id="pagination">
+                {#        <nav aria-label="Page navigation">#}
+                <ul class="my-pagination">
+                    {{ page_nav_html|safe }}
+                    {#     </ul></nav>#}
+            </div>
+
+
+        {% else %}
+                <h1 style="text-align: center; font-weight: normal">空空如也</h1>
+                <p>快去写点什么吧...</p>
+            {% endif %}
+        </div>
+    </div>
+
+
+
+{% endblock articles %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load mytags %}
+{% block articles %}
+    <div id="posts" class="posts-expand">
+        <div class="post-block page" style="opacity: 1; display: block;">
+            <header class="post-header" style="opacity: 1; display: block; transform: translateY(0px);">
+                <h1 class="post-title">tags</h1>
+            </header>
+            <div class="post-body" style="opacity: 1; display: block; transform: translateY(0px);">
+                <div class="tag-cloud">
+                    <div class="tag-cloud-title">
+                        目前共计 {{ tag_obj_list.count }} 个标签
+                    </div>
+                    <div class="tag-cloud-tags">
+                        {% for tag_obj in tag_obj_list %}
+                            <a href="{% url 'tag_detail' site=site tag=tag_obj.title %}" style="{{ tag_obj.article_set.count|get_style }}; border-bottom: 1px solid #999">{{ tag_obj.title }}</a>
+
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock articles %}
