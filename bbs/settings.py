@@ -222,18 +222,18 @@ LOGGING = {
 
 
 # 七牛云
-access_key = '06mxACko2SiFvSM-GeQyuoPPbrGdqUEZIHa-AIza'
-secret_key = 'mjBSfxVhLJbHPFTvKcRBOCWM46WxBQvzvzbQa-7n'
+access_key = '*'
+secret_key = '*'
 
 # 极验科技
-pc_id = "3878be42f552141e73be470b70021100"
-pc_key = "abe6f919c31ad7f17d060507334a690f"
+pc_id = "*"
+pc_key = "*"
 
 # haystack搜索相关设置
 HAYSTACK_CONNECTIONS = {
     'default': {
-        # 'ENGINE': 'blog.whoosh_cn_backend.WhooshEngine',  # 使用jieba分词选这个
-        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
+        'ENGINE': 'blog.whoosh_cn_backend.WhooshEngine',  # 使用jieba分词选这个
+        # 'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
         'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
     },
 }
